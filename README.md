@@ -1,4 +1,4 @@
-# FACEREC_GAN
+# GAN Experiments for CUED IIB Project
 Code for training diffrent versions of GANs with few different architecture for Generator and Discriminator
 The code is built on a fork of [the popular project under the same title](https://github.com/igul222/improved_wgan_training).
 Inspiration for the code style/structure is taken from [here](https://github.com/tdeboissiere/DeepLearningImplementations/tree/master/WGAN-GP) and [here](https://github.com/YuguangTong/improved_wgan_training).
