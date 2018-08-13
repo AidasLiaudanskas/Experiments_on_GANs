@@ -34,3 +34,30 @@ Code for reproducing experiments in ["Improved Training of Wasserstein GANs"](ht
 
 - Python, NumPy, TensorFlow, SciPy, Matplotlib
 - A recent NVIDIA GPU
+
+
+## How to run the experiments:
+
+1. Specify desired architectures in mix_and_match.py
+2. Finish training
+3. Run score_avg_test.py to calculate mean offsets (real_fake_half.npz).
+  3.1. Run half_real_fake_stats_proc.py  
+  3.2. Run real_images_test.py
+4. Run mix_and_match_test.py to see which discriminators were fooled (account for offsets?)
+5. Generate figures
+6. Generate LIME explanations
+
+Final check before generating all figures:
+Need 4 .npz files:
+evaluation_stats.npz (by mix_and_match_test.py)
+mean_offsets.npz (by half_real_fake_stats_proc.py)
+real_evaluation_stats.npz (by real_images_test.py)
+real_fake_half.npz (by score_avg_test.py)
+
+
+
+
+
+### TODO:
+fid.py in minst test is the most up to date - fixed inefficient loading.
+same with mix_and_match_test.py -- fixed memory hogging.

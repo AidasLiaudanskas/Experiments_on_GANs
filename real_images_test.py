@@ -110,7 +110,8 @@ def evaluate():
     DCG = DCGAN()
     num_pool_workers = 1
     i = 0
-    for k, disc in enumerate(save_files):
+    for k, disc in enumerate(tqdm(save_files)):
+        # disc = save_files[k]
         DCG.set_D_dim(indexes[k])
         print("D_dim set to ", indexes[k])
         # test_function(DCG, gen, disc)

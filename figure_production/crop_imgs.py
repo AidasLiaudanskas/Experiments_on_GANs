@@ -1,9 +1,16 @@
+"""
+Crops LIME explanations to fit in the report.
+
+"""
+
 import os
 from PIL import Image
 
+image_dir = "/home/aidas/GAN_data/lime_all/outputs/filtered_lime_run5"
+
 
 def crop_64s():
-    image_dir = "/home/aidas/GAN_data/lime_all/outputs/filtered_lime_run5"
+    # image_dir = "/home/aidas/GAN_data/lime_all/outputs/filtered_lime_run5"
     imgs_in_dir = os.listdir(image_dir)
     imgs_in_dir = [x for x in imgs_in_dir if ("G_64" in x)]
     img_path = os.path.join(image_dir, imgs_in_dir[0])
@@ -33,7 +40,6 @@ def crop_64s():
 
 
 def crop_reals():
-    image_dir = "/home/aidas/GAN_data/lime_all/outputs/filtered_lime_run5"
     imgs_in_dir = os.listdir(image_dir)
     imgs_in_dir = [x for x in imgs_in_dir if ("real" in x)]
     img_path = os.path.join(image_dir, imgs_in_dir[0])

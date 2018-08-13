@@ -1,4 +1,12 @@
 '''
+TL;DR:
+Calculates mean offsets.
+
+Explanation:
+WGAN-GP discriminator's scalar outputs are not symmetric about 0.
+This script find's the average scalar value for certain discriminator by:
+Averaging the outputs of 100 purely real and 100 purely fake batches for each G&D pair.
+
 Tests the mean of the output for each combination of G and D for real, fake and mixed dataself.
 The mean output of mixed data is the mean of real and fake as expected.
 '''
