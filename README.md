@@ -1,6 +1,6 @@
 # GAN Experiments for CUED IIB Project
 Code for training diffrent versions of GANs with few different architecture for Generator and Discriminator
-The code is built on a fork of [the popular project under the same title](https://github.com/igul222/improved_wgan_training).
+The code is built on a fork of [this repository](https://github.com/igul222/improved_wgan_training).
 Inspiration for the code style/structure is taken from [here](https://github.com/tdeboissiere/DeepLearningImplementations/tree/master/WGAN-GP) and [here](https://github.com/YuguangTong/improved_wgan_training).
 Code is written in Python3 and has no python2 support at the moment.
 
@@ -27,7 +27,6 @@ It trains many architectures in a row by spawning separate processes to avoid Te
 
 [Description of the original repository](https://github.com/igul222/improved_wgan_training)
 ======================================
-Code for reproducing experiments in ["Improved Training of Wasserstein GANs"](https://arxiv.org/abs/1704.00028).
 
 
 ## Prerequisites
@@ -58,6 +57,7 @@ real_fake_half.npz (by score_avg_test.py)
 
 
 
-### TODO:
+### Latest Updates:
 fid.py in minst test is the most up to date - fixed inefficient loading.
 same with mix_and_match_test.py -- fixed memory hogging.
+mnist test has MMD hanging problem fixed.

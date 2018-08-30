@@ -29,7 +29,9 @@ def read_data():
     # files_to_read
     # x = files_to_read[0]
     # x.split("_")
-    data_to_load = ["32", "48", "64", "80", "128"]
+    int_list = [4, 8, 12, 16, 20, 24, 32, 28, 40, 48, 56, 64, 72, 80]
+    data_to_load = [str(x) for x in int_list]
+    # data_to_load = ["32", "48", "64", "80", "128"]
     sym_archs = set([x.split("_")[1] for x in files_to_read if x.split("_")[1] == x.split("_")[2]])
     int_list = [int(x) for x in sym_archs]
     data_to_load = sorted(int_list)
@@ -42,11 +44,11 @@ def read_data():
         gan_data
         gan = {}
         for i, data in enumerate(gan_data):
-            r = 25
-            if index > 99:
-                r = 27
-            if index < 10:
-                r = 23
+            r = 32
+            if int(index) > 99:
+                r = 34
+            if int(index) <=9:
+                r = 30
             gan[data[r:]] = pd.read_csv(os.path.join(
                 csv_dir, data), usecols=(1, 2), header=0)
         data_dicts.append(gan)

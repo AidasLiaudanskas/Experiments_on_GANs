@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+os.chdir("/home/aidas/Experiments_on_GANs/figure_production")
 
 tag_names = ('distances/FD', 'distances/FID', "distances/IS_mean",
              "distances/KID", "distances/L2", "distances/chi_square",
@@ -23,21 +24,58 @@ tags
 len(tag_names)
 
 
+"""
+    ("DCGAN_4_4", 4, 4, 1, 1, "LSUN", True),
+    ("DCGAN_8_8", 8, 8, 1, 1, "LSUN", True),
+    ("DCGAN_6_6", 6, 6, 1, 1, "LSUN", True),
+    ("DCGAN_12_12", 12, 12, 1, 1, "LSUN", True),
+    ("DCGAN_16_4", 16, 4, 1, 1, "LSUN", True),
+    ("DCGAN_16_8", 16, 8, 1, 1, "LSUN", True),
+    ("DCGAN_16_12", 16, 12, 1, 1, "LSUN", True),
+    ("DCGAN_16_16", 16, 16, 1, 1, "LSUN", True),
+    ("DCGAN_20_20", 20, 20, 1, 1, "LSUN", True),
+    ("DCGAN_24_24", 24, 24, 1, 1, "LSUN", True),
+    ("DCGAN_32_32", 32, 32, 1, 1, "LSUN", True),
+    ("DCGAN_28_28", 28, 28, 1, 1, "LSUN", True),
+    ("DCGAN_32_8", 32, 8, 1, 1, "LSUN", True),
+    ("DCGAN_32_16", 32, 16, 1, 1, "LSUN", True),
+    ("DCGAN_32_24", 32, 24, 1, 1, "LSUN", True),
+    ("DCGAN_32_40", 32, 40, 1, 1, "LSUN", True),
+    ("DCGAN_32_48", 32, 48, 1, 1, "LSUN", True),
+    ("DCGAN_64_16", 64, 16, 1, 1, "LSUN", True),
+    ("DCGAN_64_32", 64, 32, 1, 1, "LSUN", True),
+    ("DCGAN_64_48", 64, 48, 1, 1, "LSUN", True),
+    ("DCGAN_40_40", 40, 40, 1, 1, "LSUN", True),
+    ("DCGAN_48_48", 48, 48, 1, 1, "LSUN", True),
+    ("DCGAN_56_56", 56, 56, 1, 1, "LSUN", True),
+    ("DCGAN_64_64", 64, 64, 1, 1, "LSUN", True),
+    ("DCGAN_72_72", 72, 72, 1, 1, "LSUN", True),
+    ("DCGAN_80_80", 80, 80, 1, 1, "LSUN", True),
+
+"""
+
+# int_list = [4, 8, 12, 16, 20, 24, 32, 28, 40, 48, 56, 64, 72, 80]
+# int_list = [4, 8, 12, 16, 20, 24, 32, 28]
+int_list = [40, 48, 56, 64, 72, 80]
+
+# data_to_load = ["32", "48", "64", "80", "128"]
+data_to_load = [str(x) for x in sorted(int_list)]
+
 def read_data():
     csv_dir = "./outputs/csv_data"
     files_to_read = os.listdir(csv_dir)
-    data_to_load = ["32", "48", "64", "80", "128"]
     data_dicts = []
     for index in data_to_load:
         # NOTE: Loads only symmetric architectures here
         gan_data = [x for x in files_to_read if str(index + "_" + index) in x]
         gan = {}
+        #  r is for name offsets
         for i, data in enumerate(gan_data):
-            r = 25
+            r = 32
             if int(index) > 99:
-                r = 27
+                r = 34
             if int(index) <=9:
-                r = 23
+                r = 30
             gan[data[r:]] = pd.read_csv(os.path.join(
                 csv_dir, data), usecols=(1, 2), header=0)
         data_dicts.append(gan)
@@ -52,17 +90,18 @@ def plot_data(data):
     keys = sorted(list(data.keys()))
     key_ints = [int(x) for x in keys]
     keys= [x for _,x in sorted(zip(key_ints,keys))]
-    markers = ["o", "v", "*", "D",  ">", "<" ]
+    markers = ["o", "v", "*", "D",  ">", "<", "p",  "X", "0"]
     key_to_marker = {}
     for i, key in enumerate(keys):
         key_to_marker[key] = markers[i]
-
+    # data["6"]
     fig, ax = plt.subplots(nrows=5, ncols=2, sharex=True, figsize  = (8,11))
     # figsize=(4, 10)
     plt.subplot(5, 2, 1)
     figure_name = "distances_FD"
     hands = []
     for key in keys:
+        print("key is ", key)
         repr = "-" + key_to_marker[key]
         steps = data[key][figure_name].iloc[:, 0]
         values = data[key][figure_name].iloc[:, 1]
@@ -191,12 +230,12 @@ def plot_data(data):
     for i in range(1,11):
         plt.subplot(5, 2, i)
         plt.grid(True)
-        plt.xlim(0, 8000)
+        # plt.xlim(0, 8000)
     plt.subplots_adjust(wspace=0.07, hspace=0.05)
     # plt.suptitle('LIME Explanations for G.dim = {}, D.dim = {}'.format(G_dim, D_dim))
     plt.tight_layout()
     save_path = "./outputs/metrics/"
-    save_name = "metrics_comparison.png"
+    save_name = "metrics_comparison_{}-{}.png".format(min(int_list),max(int_list))
     plt.savefig(save_path + save_name, dpi=None, format="png",)
     plt.show()
 
