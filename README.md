@@ -57,11 +57,11 @@ Some files are obsolete, as the main goal of the codebase changed with time.
 1. Specify desired hyperparameters in mix_and_match.py. Archietures can be changed in DCGANS.py
 2. Wait for training to finish.
 3. Run score_avg_test.py to calculate mean offsets (real_fake_half.npz).
-  3.1. Run half_real_fake_stats_proc.py  
-  3.2. Run real_images_test.py
-4. Run mix_and_match_test.py to see which discriminators were fooled
-5. Generate figures
-6. Generate LIME explanations
+4.  Run half_real_fake_stats_proc.py  
+5.  Run real_images_test.py
+6. Run mix_and_match_test.py to see which discriminators were fooled
+7. Generate figures
+8. Generate LIME explanations
 
 Final check before generating all stat figures:
 Need 4 .npz files:

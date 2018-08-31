@@ -3,21 +3,14 @@ TL;DR:
 Calculates inception v3 activations on real dataset, stores them in ./tmp/dataset_stats.npz
 
 
-
 In order to calculate FID/KID we need to have inception_v3 activations calculated
 on the actual dataset. This script does that and saves the activations in a npz file.
 """
 
 
-#!/usr/bin/env python3
-
-# import os
-# import glob
-#os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 import numpy as np
 import tensorflow as tf
 import fid
-# from scipy.misc import imread
 import flags
 import helpers
 FLAGS = tf.app.flags.FLAGS
@@ -27,7 +20,6 @@ batch_size = BATCH_SIZE = FLAGS.batch_size
 
 # path for where to store the statistics
 output_path = './tmp/' + FLAGS.dataset + '_stats.npz'
-# output_path_kid = './tmp/' + FLAGS.dataset + '_activations.npz'
 # if you have downloaded and extracted
 #   http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz
 # set this path to the directory where the extracted files are, otherwise
@@ -43,8 +35,6 @@ print("create inception graph..", end=" ", flush=True)
 fid.create_inception_graph(inception_path)
 print("ok")
 
-# images = tf.squeeze(
-#     tf.round((input_pipeline(train_data_list, batch_size=BATCH_SIZE) + 1) * 255))
 images = tf.squeeze(((input_pipeline(train_data_list, batch_size=BATCH_SIZE))))
 # Split data over multiple GPUs:
 print("calculte FID stats..", end=" ", flush=True)
@@ -60,16 +50,12 @@ with tf.Session(config=config) as sess:
         # Build a massive array of dataset images
         for i in range(no_images // batch_size):
             np_images = np.squeeze(np.asarray(sess.run([images])))
-            # print(np_images)
-            # print("np_images shape", np_images.shape)
             temp_image_list[i * batch_size:(i + 1) *
                             batch_size, :, :, 0] = np_images
             temp_image_list[i * batch_size:(i + 1) *
                             batch_size, :, :, 1] = np_images
             temp_image_list[i * batch_size:(i + 1) *
                             batch_size, :, :, 2] = np_images
-#            print(i)
-            # break
         mu, sigma, activations_pool3, _ = fid.calculate_activation_statistics(
             temp_image_list, sess, batch_size=32, verbose=False)
         np.savez_compressed(output_path, mu=mu, sigma=sigma,

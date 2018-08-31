@@ -72,16 +72,9 @@ marginalized_means = np.mean(means_matrix, axis=0)
 
 def explain(params=None):
     DCG, disc, images_to_explain, d_index, normalize_by_mean = params
-    # global global_imgs_to_explain
-    # DCG = DCGAN()
-    # DCG.set_G_dim(64)
-    # DCG.set_D_dim(64)
-    # gen = disc = "DCGAN_64_64_celebA_64x64"
-    # Generator = DCG.DCGANG_1
     Discriminator = DCG.DCGAND_1
     BATCH_SIZE = FLAGS.batch_size
     with tf.Graph().as_default() as graph:
-        # fake_data = Generator(BATCH_SIZE)
         train_data_list = helpers.get_dataset_files()
         real_data = input_pipeline(train_data_list, batch_size=BATCH_SIZE)
         # Normalize -1 to 1
@@ -135,24 +128,17 @@ def explain(params=None):
                 segmenter = SegmentationAlgorithm(
                     'slic', n_segments=100, compactness=1, sigma=1)
                 try:
-                    # real_im = sess.run([real_data])[0][0][0][0:5]
-                    # print("Real Image range sample: ", real_im)
                     if not len(images_to_explain):
                         images_to_explain = sess.run(real_data)[:no_samples]
-                        # print("Image batch shape: ", np.shape(images_to_explain))
                         images_to_explain = (images_to_explain + 1.0) * 255.0 / 2.0
                         images_to_explain = images_to_explain.astype(np.uint8)
                         images_to_explain = np.reshape(
                         images_to_explain, [no_samples, 64, 64, 3])
-                        # print("Image shape: ", image_to_explain.shape)
-                    # print("Image sample: ", image_to_explain[1][0:5][1])
                     for image_to_explain in tqdm(images_to_explain):
-                        # tmp = time.time()
                         explanation = explainer.explain_instance(image_to_explain,
                                                                  classifier_fn=disc_prediction, batch_size=256,
                                                                  top_labels=2, hide_color=None, num_samples=no_perturbed_images,
                                                                  segmentation_fn=segmenter)
-                        # print(time.time() - tmp)
                         explanations.append(explanation)
                 except KeyboardInterrupt as e:
                     print("Manual interrupt occurred.")
@@ -186,16 +172,13 @@ def make_figures(images_to_explain, explanations, G_dim, D_dim, normalize_by_mea
         plt.imshow(mark_boundaries(temp, mask))
         plt.xticks([])
         plt.yticks([])
-    # print("Figures ready")
     plt.subplots_adjust(wspace=0.01, hspace=0.01)
-    # plt.suptitle('LIME Explanations for G.dim = {}, D.dim = {}'.format(G_dim, D_dim))
     plt.tight_layout()
     save_path = "./outputs/LIME/"
     save_name = "lime_real_D_{}.png".format(D_dim)
     if normalize_by_mean:
         save_name = "norm_lime_real_D_{}.png".format(D_dim)
     plt.savefig(save_path + save_name, dpi=None, format="png",)
-    # plt.show()
 
 
 def evaluate():
@@ -207,7 +190,6 @@ def evaluate():
      2.2 For load each discriminator and
     3. Run 100k samples and see the discriminator output.
     """
-    # os.chdir("/home/aidas/GAN_Experiments/progressive_test")
     current_dir = os.getcwd()
     print("Current_dir = ", current_dir)
     model_dir = "./saved_models"
@@ -218,8 +200,6 @@ def evaluate():
     indexes = [int(x.split("_")[1]) for x in save_files]
     save_files = [x for _, x in sorted(zip(indexes, save_files))]
     indexes = sorted(indexes)
-    # save_files = save_files[-10:]
-    # indexes = indexes[-10:]
     print("Save files found: ", save_files)
     print("Depths parsed: ", indexes)
     l = len(save_files)
@@ -228,10 +208,7 @@ def evaluate():
     images_to_explain = []
     for normalize_by_mean in [True, False]:
         for k, disc in enumerate(tqdm(save_files)):
-            # print("G_dim set to ", indexes[j])
             DCG.set_D_dim(indexes[k])
-            # print("D_dim set to ", indexes[k])
-            # test_function(DCG, gen, disc)
             param_tuple = (DCG, disc, images_to_explain, k, normalize_by_mean)
             with contextlib.closing(Pool(1)) as po:
                 pool_results = po.map_async(

@@ -1,12 +1,11 @@
 """
 Singleton class containing all the important parameters for training.
 
-""""
+"""
 
 import tensorflow as tf
 
 FLAGS = tf.app.flags.FLAGS
-# a = flags()
 # This file defines default values. They can be altered here or in command line
 # image format is by default NCHW
 
@@ -63,7 +62,6 @@ class flags(Singleton):
         ############
         # Model_specific parameters
         ############
-        # tf.app.flags.DEFINE_string('run', None, "Which operation to run. [train|inference]")
         tf.app.flags.DEFINE_integer(
             'model_dim', 64, "Dimensionality of the model")
         tf.app.flags.DEFINE_string(
@@ -96,8 +94,6 @@ class flags(Singleton):
             'nb_epoch', 4, "Number of epochs to train for")
         tf.app.flags.DEFINE_integer(
             'batch_size', batch_size, "Number of samples per batch. Scales with no_of_gpus")
-        # tf.app.flags.DEFINE_integer(
-        #     'nb_batch_per_epoch', 50, "Number of batches per epoch")
         tf.app.flags.DEFINE_float('learning_rate', 2E-4,
                                   "Learning rate used for AdamOptimizer")
         tf.app.flags.DEFINE_integer(
@@ -121,18 +117,13 @@ class flags(Singleton):
         ##########
         # Datasets
         ##########
-        # tf.app.flags.DEFINE_string('data_format', "NHWC", "Tensorflow image data format.")
-        # CPU support and NHWC hasn't been thoroughly tested, use GPU mode for reliable results
         tf.app.flags.DEFINE_string('data_format', "NHWC",
                                    "Tensorflow image data format: NHWC or NCHW. CPU only supports NHWC")
-        # tf.app.flags.DEFINE_boolean(
-        #     'use_GPU', True, "Whether to use GPU.")
         tf.app.flags.DEFINE_string(
             'dataset_path', "../data", "Path to where the tfrecords files are")
         tf.app.flags.DEFINE_integer('images_per_file', images_per_file,
                                     "Number of pictures per tfrecords file, so we'd know how much an epoch is")
 
-        # tf.app.flags.DEFINE_integer('channels', 3, "Number of channels")
         tf.app.flags.DEFINE_float('central_fraction', 0.8,
                                   "Central crop as a fraction of total image")
 

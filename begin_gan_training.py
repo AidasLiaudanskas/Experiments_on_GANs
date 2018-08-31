@@ -11,18 +11,15 @@ Implementation of begin_training function, which builds:
 import os
 import tensorflow as tf
 from tqdm import tqdm
-# import time
 import numpy as np
 import tflib as lib
 from metrics import chi_square, L_norm, frechet_distance, cos_distance
 import fid
-# import flags
 from input_pipe import input_pipeline
-# from DandG import *
 import helpers
 FLAGS = tf.app.flags.FLAGS
-# if 'TF_CPP_MIN_LOG_LEVEL' not in os.environ:
-#     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Get rid of console garbage
+if 'TF_CPP_MIN_LOG_LEVEL' not in os.environ:
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Get rid of console garbage
 
 N_GPUS = len(FLAGS.gpus_to_use.split(','))
 # How many iterations to train the discriminator for
@@ -45,7 +42,6 @@ def begin_training(params):
     builds the rest of the graph.
 
     """
-    # print(params)
     model_name, Generator, Discriminator, epochs, restore = params
     fid_stats_file = "./tmp/"
     inception_path = "./tmp/"
@@ -55,7 +51,6 @@ def begin_training(params):
     SAVE_DIR = "./saved_models/" + MODEL_NAME + "/"
     OUTPUT_DIR = './outputs/' + MODEL_NAME + "/"
     helpers.refresh_dirs(SUMMARY_DIR, OUTPUT_DIR, SAVE_DIR, restore)
-    # Generator, Discriminator = GeneratorAndDiscriminator()
     with tf.Graph().as_default():
         with tf.variable_scope('input'):
             all_real_data_conv = input_pipeline(
@@ -87,7 +82,6 @@ def begin_training(params):
         fid.create_inception_graph(inception_path)
 
         # Create session
-        # , operation_timeout_in_ms=30000
         config = tf.ConfigProto(allow_soft_placement=True)
         config.gpu_options.allow_growth = True
         if FLAGS.use_XLA:
@@ -116,9 +110,7 @@ def begin_training(params):
             helpers.sample_dataset(sess, all_real_data_conv, OUTPUT_DIR)
             # Training loop
             try:
-                # while not coord.should_stop():
                 ep_start = (global_step.eval(sess)) // EPOCH
-                # print("ep_start: ", ep_start)
                 for epoch in tqdm(range(ep_start, TRAIN_FOR_N_EPOCHS), desc="Epochs passed"):
                     step = (global_step.eval(sess)) % EPOCH
                     for _ in tqdm(range(step, EPOCH), desc="Current epoch %i" % epoch, mininterval=0.5):
@@ -140,7 +132,6 @@ def begin_training(params):
                             summary_writer.add_summary(
                                 distances_summary, step)
 
-                            # This way the generation happens every 51.2k = 1.6k*32 images seen. Less overhead
                         if step % (512) == 0:
                             saver.save(sess, SAVE_DIR, global_step=step)
                             helpers.generate_image(step, sess, OUTPUT_DIR,
@@ -154,7 +145,6 @@ def begin_training(params):
                             scalar_avg_real = np.mean(real_out)
                             scalar_sdev_real = np.std(real_out)
 
-                            # print("Scalar_avg , std: ", scalar_avg, sca)
                             frechet_dist = frechet_distance(
                                 pre_real_out, pre_fake_out)
                             kid_score = np.mean(kid_score)
@@ -178,7 +168,6 @@ def begin_training(params):
                             inception_summary.value.add(
                                 tag="distances/scalar_sdev_real", simple_value=scalar_sdev_real)
                             summary_writer.add_summary(inception_summary, step)
-                    # break
             except KeyboardInterrupt as e:
                 print("Manual interrupt occurred.")
             except Exception as e:
@@ -190,8 +179,6 @@ def begin_training(params):
                 saver.save(sess, SAVE_DIR, global_step=step)
                 print("Model " + MODEL_NAME +
                       " saved in file: {} at step {}".format(SAVE_DIR, step))
-                # tf.reset_default_graph()
-
 
 def fake_batch_stats(sess, fake_data):
     """
@@ -205,31 +192,21 @@ def fake_batch_stats(sess, fake_data):
         out_shape = [batch_size, FLAGS.n_ch, FLAGS.height, FLAGS.height]
     else:
         out_shape = [batch_size, FLAGS.height, FLAGS.height, FLAGS.n_ch]
-    # output=tf.reshape(inputs, out_shape)
 
     if "mnist" in FLAGS.dataset:
         for i in range(no_images // batch_size):
             np_images = np.asarray(
                 sess.run(tf.squeeze(tf.round(tf.reshape(fake_data, out_shape)))))
-            # print(np_images)
-            # print("np_images shape", np_images.shape)
             temp_image_list[i * batch_size:(i + 1) *
                             batch_size, :, :, 0] = np_images
             temp_image_list[i * batch_size:(i + 1) *
                             batch_size, :, :, 1] = np_images
             temp_image_list[i * batch_size:(i + 1) *
                             batch_size, :, :, 2] = np_images
-        # print(i)
     else:
         for i in range(no_images // batch_size):
-            # np_images = np.asarray(
-            #     sess.run(tf.squeeze(tf.round((fake_data + 1) * 255))))
-            # TODO: Not entirely sure if images are -1 to 1 or 0 to 255
             np_images = np.asarray(
                 sess.run(tf.squeeze(tf.round((tf.reshape(fake_data, out_shape) + 1) * 255))))
-            # print("Entering image prep step, image:")
-            # print(np_images[5,:,:,:])
-
             temp_image_list[i * batch_size:(i + 1) *
                             batch_size, :, :, :] = np_images
 
@@ -248,15 +225,8 @@ def add_summaries(gen_cost, disc_cost, fake_data, real_data, gen_learning_rate, 
     if FLAGS.gan_version == "wgan-gp":
         tf.summary.scalar("performance/gradient_penalty",
                           gradient_penalty, collections=["performance"])
-    # L1 = L_norm(pre_real, pre_fake, 1)
     L2 = L_norm(pre_real, pre_fake, 2)
     cos = cos_distance(pre_real, pre_fake)
-    # fid = get_fid_score(fake_data)
-    # inception_score = get_fid_score(fake_data)
-    # tf.summary.scalar("distances/FID", fid, collections=["distances"])
-    # tf.summary.scalar("distances/IS", inception_score,
-    #                   collections=["distances"])
-    # tf.summary.scalar("distances/L1", L1, collections=["distances"])
     tf.summary.scalar("distances/L2", L2, collections=["distances"])
     tf.summary.scalar("distances/cos", (1 - cos),
                       collections=["distances"])
@@ -325,8 +295,6 @@ def split_and_setup_costs(Generator, Discriminator, split_real_data_conv):
             real_data = tf.reshape(2 * ((tf.cast(real_data_conv, tf.float32) / 255.) - .5), [
                                    BATCH_SIZE // len(DEVICES), OUTPUT_DIM])
             fake_data = Generator(BATCH_SIZE // len(DEVICES))
-            # print("Real_data shape: ", real_data.shape)
-            # print("fake_data shape: ", fake_data.shape)
             disc_real, pre_real = Discriminator(real_data)
             disc_fake, pre_fake = Discriminator(fake_data)
 
@@ -398,4 +366,3 @@ if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = str(
         FLAGS.gpus_to_use)  # Select which GPU to use
     tf.app.run()
-    # main()

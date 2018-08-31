@@ -10,7 +10,6 @@ import tflib.ops.batchnorm
 import tflib.ops.deconv2d
 import tflib.save_images
 import tflib.celebA_64x64  # This is where the input_pipe is
-# import tflib.small_imagenet
 import tflib.ops.layernorm
 import tflib.plot
 import numpy as np
@@ -18,8 +17,6 @@ from glob import glob
 import os
 import functools
 FLAGS = tf.app.flags.FLAGS
-# print(FLAGS.gan_version)
-# BATCH_SIZE = FLAGS.batch_size
 
 
 def LeakyReLU(x, alpha=0.2):
@@ -136,15 +133,6 @@ def get_dataset_files():
     train_data_list = []
     for entity in files:
         train_data_list.append(entity)
-    # Addition for multiple files:
-    # images_per_file = FLAGS.images_per_file
-    # if "celebA" in FLAGS.dataset:
-    #     images_per_file = 206000
-    # elif "profile_imgs_tfrecords" in FLAGS.dataset:
-    #     images_per_file = 470000
-    # elif "mnist" in FLAGS.dataset:
-    #     images_per_file = 60000
-    # # print (train_data_list)
     return train_data_list
 
 
@@ -186,9 +174,6 @@ def generate_image(iteration, sess, output_dir, all_fixed_noise_samples, Generat
         'generator output', samples_reshaped)
     image_summary, samples = sess.run(
         [image_op, all_fixed_noise_samples])
-    # summary_writer.add_summary(image_summary, iteration)
-    # samples = sess.run(all_fixed_noise_samples)
-
     samples = ((samples + 1.) * (255.99 / 2)).astype('int32')
     samples = np.reshape(samples, output_shape)
     if FLAGS.data_format == "NHWC" and samples.shape[3] in [1, 3]:
@@ -205,13 +190,10 @@ Making a sample of how the training data looks like
 
 def sample_dataset(sess, all_real_data_conv, output_dir):
     _x_r = sess.run(all_real_data_conv)
-    # print(_x_r[0])
     if np.amin(_x_r) < 0:
         _x_r = ((_x_r + 1.) * (255.99 / 2)).astype('int32')
-        # print("Took path less than zero")
     else:
         _x_r = (_x_r).astype('int32')
-    # print("Dataset was sampled")
     if FLAGS.data_format == "NHWC":
         lib.save_images.save_images(np.transpose(_x_r.reshape(
             (FLAGS.batch_size, FLAGS.height, FLAGS.height, FLAGS.n_ch)), (0,3,1,2)), output_dir + '/samples_groundtruth.png')

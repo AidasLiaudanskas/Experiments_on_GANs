@@ -22,12 +22,9 @@ import os
 import sys
 import warnings
 import numpy as np
-# import gzip
-# import pickle
 import tensorflow as tf
 from scipy.misc import imread
 from scipy import linalg
-# import urllib
 from tqdm import tqdm
 from KID_score import polynomial_mmd_averages
 import flags
@@ -195,7 +192,6 @@ def calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
         covmean = covmean.real
 
     tr_covmean = np.trace(covmean)
-    # print("Finished FID calculation")
     return diff.dot(diff) + np.trace(sigma1) + np.trace(sigma2) - 2 * tr_covmean
 #-------------------------------------------------------------------------------
 
@@ -219,11 +215,8 @@ def calculate_activation_statistics(images, sess, batch_size=32, verbose=False):
     -- softmax_activations : activations at the output (softmax) of inception
     net after feeding the images
     """
-    # assert type(images) == list, "Not a list"
     assert type(images[0]) == np.ndarray, "Not a numpy array"
     assert len(images[0].shape) == 3, "Images have less than 3 dimensions"
-    # assert np.max(images[0]) > 10, "Max is less than 10"
-    # print("max of passed images is: ", np.max(images[0]) )
     assert np.min(images[0]) >= 0.0, "Min is less than 0"
     pool3_activations, softmax_activations = get_activations(
         images, sess, batch_size, verbose)

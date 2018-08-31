@@ -1,7 +1,10 @@
+"""
+Extracts values from TF summary as csv.
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
 
 import csv
 import errno
@@ -63,10 +66,6 @@ def mkdir_p(directory):
 
 
 def main():
-    # run_names = (
-    #     'scalars_demo/temperature:t0=270,tA=270,kH=%s' % x
-    #     for x in ('0.001', '0.005')
-    # )
     tag_names = ('distances/FD', 'distances/FID', "distances/IS_mean",
                  "distances/KID", "distances/L2", "distances/chi_square",
                  "distances/cos", "distances/scalar_mean_fake",
@@ -75,7 +74,6 @@ def main():
                  "performance/D_loss", "performance/gradient_penalty")
 
     logdir = './summary'
-# model_dir = "./saved_models"
     run_names = os.listdir(logdir)
     output_dir = './outputs/csv_data'
     mkdir_p(output_dir)

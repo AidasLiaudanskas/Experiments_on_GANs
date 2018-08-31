@@ -1,3 +1,8 @@
+"""
+Calculates KID score based on their paper/codebase.
+"""
+
+
 from __future__ import division, print_function
 import os.path
 import sys

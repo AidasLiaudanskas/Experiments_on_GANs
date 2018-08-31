@@ -13,8 +13,6 @@ for every G:
 also do the same with real images:
 for every D:
     show 20 images with explanations
-
-
 '''
 
 import os
@@ -46,17 +44,6 @@ from lime.wrappers.scikit_image import SegmentationAlgorithm
 from skimage.segmentation import mark_boundaries
 
 
-"""
-Complications:
-Discriminator expects a batch size of 256, which is hardcoded. If I want to do inference on
-a single image I'll have to augment the batch to 256 with potentially zeros at the end.
-Slowing down everything horrendously -.-
-
-Solved.
-
-"""
-
-
 no_samples = 16
 # I.e. number of images to generate with explanations ^
 
@@ -71,24 +58,15 @@ f = np.load(stats_file)
 f.keys()
 means_matrix = f["means_matrix"]
 
-# normalize_by_mean = True
-
-
 def explain(params=None):
     DCG, gen, disc, g_index, d_index, normalize_by_mean = params
-    # DCG = DCGAN()
-    # DCG.set_G_dim(64)
-    # DCG.set_D_dim(64)
-    # gen = disc = "DCGAN_64_64_celebA_64x64"
     Generator = DCG.DCGANG_1
     Discriminator = DCG.DCGAND_1
     BATCH_SIZE = FLAGS.batch_size
     with tf.Graph().as_default() as graph:
         noise_tf = tf.convert_to_tensor(noise, dtype=tf.float32)
         fake_data = Generator(BATCH_SIZE)
-        # print("Fake_data shape: ", fake_data.shape)
         disc_fake, pre_fake = Discriminator(fake_data)
-        # print("disc_fake shape: ", disc_fake.shape)
         gen_vars = lib.params_with_name('Generator')
         gen_saver = tf.train.Saver(gen_vars)
         disc_vars = lib.params_with_name("Discriminator")
@@ -103,12 +81,10 @@ def explain(params=None):
         with tf.Session(config=config) as sess:
             sess.run(tf.global_variables_initializer())
             if ckpt_gen and ckpt_gen.model_checkpoint_path:
-                # print("Restoring generator...", gen)
                 gen_saver.restore(sess, ckpt_gen.model_checkpoint_path)
             else:
                 print("Failed to load Generator", gen)
             if ckpt_disc and ckpt_disc.model_checkpoint_path:
-                # print("Restoring discriminator...", disc)
                 disc_saver.restore(
                     sess, ckpt_disc.model_checkpoint_path)
 
@@ -135,9 +111,7 @@ def explain(params=None):
                         else:
                             pred_array[i, 1] = expit(x)
                             pred_array[i, 0] = 1 - pred_array[i, 1]
-                        # 1 == REAL; 0 == FAKE
                     return pred_array
-                # images_to_explain = np.zeros([no_samples, 64, 64, 3])
                 images_to_explain = sess.run(
                     [Generator(no_samples, noise=noise_tf)])[0]
                 images_to_explain = (images_to_explain + 1.0) * 255.0 / 2.0
@@ -149,12 +123,10 @@ def explain(params=None):
                 segmenter = SegmentationAlgorithm(
                     'slic', n_segments=100, compactness=1, sigma=1)
                 for image_to_explain in tqdm(images_to_explain):
-                    # tmp = time.time()
                     explanation = explainer.explain_instance(image_to_explain,
                                                              classifier_fn=disc_prediction, batch_size=256,
                                                              top_labels=2, hide_color=None, num_samples=no_perturbed_images,
                                                              segmentation_fn=segmenter)
-                    # print(time.time() - tmp)
                     explanations.append(explanation)
                 make_figures(images_to_explain, explanations,
                              DCG.get_G_dim(), DCG.get_D_dim(), normalize_by_mean)
@@ -182,15 +154,12 @@ def make_figures(images_to_explain, explanations, G_dim, D_dim, normalize_by_mea
         plt.imshow(mark_boundaries(temp, mask))
         plt.xticks([])
         plt.yticks([])
-    # print("Figures ready")
     plt.subplots_adjust(wspace=0.01, hspace=0.01)
-    # plt.suptitle('LIME Explanations for G.dim = {}, D.dim = {}'.format(G_dim, D_dim))
     plt.tight_layout()
     save_path = "./outputs/LIME/"
     save_name = "lime_G_{}_D_{}.png".format(G_dim, D_dim)
     if normalize_by_mean:
         save_name = "norm_lime_G_{}_D_{}.png".format(G_dim, D_dim)
-    # plt.show()
     plt.savefig(save_path + save_name, dpi=None, format="png",)
 
 
@@ -203,7 +172,6 @@ def evaluate(min=None, max=None):
      2.2 For load each discriminator and
     3. Run 100k samples and see the discriminator output.
     """
-    # os.chdir("/home/aidas/GAN_Experiments/progressive_test")
     current_dir = os.getcwd()
     print("Current_dir = ", current_dir)
     model_dir = "./saved_models"
@@ -214,8 +182,6 @@ def evaluate(min=None, max=None):
     indexes = [int(x.split("_")[1]) for x in save_files]
     save_files = [x for _, x in sorted(zip(indexes, save_files))]
     indexes = sorted(indexes)
-    # save_files = save_files[-10:]
-    # indexes = indexes[-10:]
     print("Save files found: ", save_files)
     print("Depths parsed: ", indexes)
     l = len(save_files)
@@ -229,10 +195,7 @@ def evaluate(min=None, max=None):
         for j, gen in enumerate(tqdm(save_files[min:max])):
             for k, disc in enumerate(tqdm(save_files)):
                 DCG.set_G_dim(indexes[min+j])
-                # print("G_dim set to ", indexes[j])
                 DCG.set_D_dim(indexes[k])
-                # print("D_dim set to ", indexes[k])
-                # test_function(DCG, gen, disc)
                 param_tuple = (DCG, gen, disc, j, k, normalize_by_mean)
                 with contextlib.closing(Pool(1)) as po:
                     pool_results = po.map_async(

@@ -40,20 +40,13 @@ def test_function(params):
     Discriminator = DCG.DCGAND_1
     BATCH_SIZE = FLAGS.batch_size
     with tf.Graph().as_default() as graph:
-        # fake_data = Generator(BATCH_SIZE)
         train_data_list = helpers.get_dataset_files()
         real_data = input_pipeline(train_data_list, batch_size=BATCH_SIZE)
         # Normalize -1 to 1
         real_data = 2 * ((tf.cast(real_data, tf.float32) / 255.) - .5)
-        # print("Fake_data shape: ", fake_data.shape)
         disc_real, _ = Discriminator(real_data)
-        # print("disc_fake shape: ", disc_fake.shape)
-        # gen_vars = lib.params_with_name('Generator')
-        # gen_saver = tf.train.Saver(gen_vars)
         disc_vars = lib.params_with_name("Discriminator")
         disc_saver = tf.train.Saver(disc_vars)
-        # ckpt_gen = tf.train.get_checkpoint_state(
-        #     "./saved_models/" + gen + "/")
         ckpt_disc = tf.train.get_checkpoint_state(
             "./saved_models/" + disc + "/")
         with tf.Session() as sess:
@@ -68,7 +61,6 @@ def test_function(params):
                     print("Restoring discriminator...", disc)
                     disc_saver.restore(
                         sess, ckpt_disc.model_checkpoint_path)
-                    # print('Variables restored from:\n', ckpt_disc.model_checkpoint_path)
                     pred_arr = np.empty([no_samples, BATCH_SIZE])
                     for i in tqdm(range(no_samples + 1)):
                         predictions = sess.run([disc_real])
@@ -111,20 +103,15 @@ def evaluate():
     num_pool_workers = 1
     i = 0
     for k, disc in enumerate(tqdm(save_files)):
-        # disc = save_files[k]
         DCG.set_D_dim(indexes[k])
         print("D_dim set to ", indexes[k])
-        # test_function(DCG, gen, disc)
         param_tuple = (DCG, disc)
         with contextlib.closing(Pool(num_pool_workers)) as po:
             pool_results = po.map_async(
                 test_function, (param_tuple for _ in range(1)))
             results_list = pool_results.get()
-            # print(results_list[0])
             results_tensor[i] = results_list[0]
             i += 1
-            # print("results_list shape: ", results_list[0].shape)
-            # print(results_list)
     print("Evaluation finished")
     output_path = './real_evaluation_stats.npz'
     np.savez_compressed(
@@ -133,7 +120,4 @@ def evaluate():
 
 
 if __name__ == '__main__':
-    # flags.define_flags()
-    # fl = flags()
-    # launch_managed_training()
     evaluate()

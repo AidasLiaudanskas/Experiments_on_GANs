@@ -11,11 +11,6 @@ def chi_square(fake_data, real_data):
     # Extra hook for debug: log chi-square distance between G's output histogram and the dataset's histogram
     value_range = [0.0, 1.0]
     nbins = 100
-    # Original code:
-    # hist_g = tf.histogram_fixed_width(
-    #     fake_data, value_range, nbins=nbins, dtype=tf.float32) / nbins
-    # hist_images = tf.histogram_fixed_width(
-    #     real_data, value_range, nbins=nbins, dtype=tf.float32) / nbins
     hist_g = tf.histogram_fixed_width(
         fake_data, value_range, nbins=nbins) / nbins
     hist_images = tf.histogram_fixed_width(
@@ -25,10 +20,13 @@ def chi_square(fake_data, real_data):
 
 
 def L_norm(pre_real, pre_fake, order):
-    # Returns the batch average of selected n_norm
-    # 1) Take difference of latent vectors
-    # 2) Take norm of that difference
-    # 3) Take average of the batch of norms
+    """
+    Returns the batch average of selected n_norm
+    1) Take difference of latent vectors
+    2) Take norm of that difference
+    3) Take average of the batch of norms
+
+    """
     return tf.reduce_mean(tf.norm(tf.subtract(pre_real, pre_fake), ord=order, axis=1))
 
 

@@ -1,5 +1,5 @@
 """
-Starting point for architecture design. Used as a reference.
+Starting point for architecture design. Used as a reference. Deprecated.
 
 """
 
@@ -10,10 +10,6 @@ import functools
 FLAGS = tf.app.flags.FLAGS
 from helpers import *
 from tensorflow.contrib import slim
-
-# OUTPUT_DIM = FLAGS.FLAGS.output_dim
-# MODE = FLAGS.gan_version
-# FLAGS.model_dim = FLAGS.model_dim
 
 
 def GeneratorAndDiscriminator():
@@ -89,7 +85,8 @@ def FCGenerator(n_samples, noise=None, FC_DIM=512):
     output = ReLULayer('Generator.2', FC_DIM, FC_DIM, output)
     output = ReLULayer('Generator.3', FC_DIM, FC_DIM, output)
     output = ReLULayer('Generator.4', FC_DIM, FC_DIM, output)
-    output = lib.ops.linear.Linear('Generator.Out', FC_DIM, FLAGS.output_dim, output)
+    output = lib.ops.linear.Linear(
+        'Generator.Out', FC_DIM, FLAGS.output_dim, output)
 
     output = tf.tanh(output)
 
@@ -195,11 +192,6 @@ def DCGANGenerator(n_samples, noise=None, dim=FLAGS.model_dim, bn=True, nonlinea
 
     return tf.reshape(output, [-1, FLAGS.output_dim])
 
-# Too powerful of a discriminator
-# Send TFRecords input to other people
-# Gan usecases - speech, facerec
-# Gradient penalty for generator only maybe? Overpowered Generator
-
 
 def Resnet101Generator(n_samples, noise=None, dim=FLAGS.model_dim):
     if noise is None:
@@ -276,7 +268,8 @@ def MultiplicativeDCGANDiscriminator(inputs, dim=FLAGS.model_dim, bn=True):
 
 
 def FCDiscriminator(inputs, FC_DIM=512, n_layers=3):
-    output = LeakyReLULayer('Discriminator.Input', FLAGS.output_dim, FC_DIM, inputs)
+    output = LeakyReLULayer('Discriminator.Input',
+                            FLAGS.output_dim, FC_DIM, inputs)
     for i in range(n_layers):
         output = LeakyReLULayer(
             'Discriminator.{}'.format(i), FC_DIM, FC_DIM, output)
@@ -339,8 +332,6 @@ def Resnet101Discriminator(inputs, dim=FLAGS.model_dim):
     output = lib.ops.linear.Linear(
         'Discriminator.Output', 4 * 4 * dim, 1, output)
 
-    # TODO originally was 4*4*8*dim
-    # Try decreasing by 8
     return tf.reshape(output / 5., [-1]), pre_output
 
 
@@ -376,7 +367,7 @@ def DCGANDiscriminator(inputs, dim=FLAGS.model_dim, bn=True, nonlinearity=LeakyR
         output = Batchnorm('Discriminator.BN4', [0, 2, 3], output)
     output = nonlinearity(output)
 
-    pre_output = output = tf.reshape(output, [-1, 4 * 4  * dim])
+    pre_output = output = tf.reshape(output, [-1, 4 * 4 * dim])
     # Originally was 4*4*8*dim
     # Now decreased to 4*4*dim = 1024 for dim=64.
     # Should be more meaningful as the image has only 4k pixels
@@ -410,7 +401,6 @@ def GeneratorCNN(z, reuse, output_num, repeat_num, data_format=FLAGS.data_format
         out = slim.conv2d(x, 3, 3, 1, activation_fn=None,
                           data_format=data_format)
 
-    # variables = tf.contrib.framework.get_variables(vs)
     return out
 
 
@@ -430,7 +420,6 @@ def DiscriminatorCNN(x, input_channel, z_num, repeat_num, hidden_num=64, data_fo
             if idx < repeat_num - 1:
                 x = slim.conv2d(x, channel_num, 3, 2,
                                 activation_fn=tf.nn.elu, data_format=data_format)
-                #x = tf.contrib.layers.max_pool2d(x, [2, 2], [2, 2], padding='VALID')
 
         x = tf.reshape(x, [-1, np.prod([8, 8, channel_num])])
         z = x = slim.fully_connected(x, z_num, activation_fn=None)
@@ -454,8 +443,3 @@ def DiscriminatorCNN(x, input_channel, z_num, repeat_num, hidden_num=64, data_fo
     # variables = tf.contrib.framework.get_variables(vs)
     # Can return above if needed
     return out, z
-
-
-# Report of what I've done so far;
-# Try cloud cluster
-#

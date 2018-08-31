@@ -100,104 +100,14 @@ def launch_managed_training():
             Discriminator = DCG.DCGAND_1
         else:
             Discriminator = DCG.DCGAND_2
-        # Generator = DCG.GoodGenerator
-        # Discriminator = DCG.GoodDiscriminator
-        # begin_training(entry[0], Generator, Discriminator, epochs, restore=entry[6])
         param_tuple = (entry[0], Generator, Discriminator, epochs, entry[6])
         with contextlib.closing(Pool(num_pool_workers)) as po:
             pool_results = po.map_async(
                 begin_training, (param_tuple for _ in range(1)))
             results_list = pool_results.get()
-            print(results_list)
-        # a bit messy, but probably more readable than the plain version.
     # This ensures that the processes get closed once they are done
     return 0
 
-#
-# def evaluate():
-#     """
-#     Should be able to mix and match various versions of GANs with this function. Steps:
-#     1. List all models available in the save_dir
-#     2. Double for loop:
-#      2.1 For each Generator
-#      2.2 For load each discriminator and
-#     3. Run 100k samples and see the discriminator output.
-#     """
-#     current_dir = os.getcwd()
-#     print("Current_dir = ", current_dir)
-#     model_dir = "./saved_models"
-#     save_files = os.listdir(model_dir)
-#     l = len(save_files)
-#     results_table = np.empty([l, l])
-#     DCG = DCGAN()
-#     BATCH_SIZE = FLAGS.batch_size
-#     for gen in save_files:
-#         for disc in save_files:
-#             for key in models_dict.keys():
-#                 if key in gen:
-#                     DCG.set_G_dim(models_dict[key][1])
-#                     print("G_dim set to ", models_dict[key][1])
-#                 if key in disc:
-#                     DCG.set_D_dim(models_dict[key][2])
-#                     print("D_dim set to ", models_dict[key][2])
-#             Generator = DCG.DCGANG_1
-#             Discriminator = DCG.DCGAND_1
-#             with tf.Graph().as_default() as graph:
-#                 fake_data = Generator(BATCH_SIZE)
-#                 print("Fake_data shape: ", fake_data.shape)
-#                 disc_fake, pre_fake = Discriminator(fake_data)
-#                 print("disc_fake shape: ", disc_fake.shape)
-#                 gen_vars = lib.params_with_name('Generator')
-#                 gen_saver = tf.train.Saver(gen_vars)
-#                 disc_vars = lib.params_with_name("Discriminator")
-#                 disc_saver = tf.train.Saver(disc_vars)
-#                 ckpt_gen = tf.train.get_checkpoint_state(
-#                     "./saved_models/" + gen + "/")
-#                 ckpt_disc = tf.train.get_checkpoint_state(
-#                     "./saved_models/" + disc + "/")
-#                 with tf.Session() as sess:
-#                     if ckpt_gen and ckpt_gen.model_checkpoint_path:
-#                         print("Restoring generator...", gen)
-#                         # TODO: Not sure which one to use
-#                         # gen_saver.restore(sess,tf.train.latest_checkpoint("./saved_models/" + gen + "/"))
-#                         gen_saver.restore(sess, ckpt_gen.model_checkpoint_path)
-#                         # print('Variables restored from:\n', ckpt_gen.model_checkpoint_path)
-#                     if ckpt_disc and ckpt_disc.model_checkpoint_path:
-#                         print("Restoring discriminator...", disc)
-#                         # TODO: Not sure which one to use
-#                         # gen_saver.restore(sess,tf.train.latest_checkpoint("./saved_models/" + gen + "/"))
-#                         disc_saver.restore(
-#                             sess, ckpt_disc.model_checkpoint_path)
-#                         # print('Variables restored from:\n', ckpt_disc.model_checkpoint_path)
-#                     pred_arr = np.empty([1000, BATCH_SIZE])
-#                     for i in range(1001):
-#                         predictions = sess.run([disc_fake])
-#                         print(predictions[0])
-#                         print(predictions[0].shape, pred_arr.shape)
-#                         pred_arr[i, :] = predictions[0]
-#                     overall_mean = np.mean(pred_arr)
-#                     overall_std = np.std(pred_arr)
-#                     batch_means = np.mean(np.mean(pred_arr, axis=1))
-#                     batch_stds = np.std(np.std(pred_arr, axis=1))
-#                     print("Overall mean and std:", overall_mean, overall_std)
-#                     print("Per batch mean means and stds:",
-#                           batch_means, batch_stds)
-
-
-"""
-Brainstorming on how to implement the evaluation:
-
-* Two graphs with two sessions, reset each on new architecture?
-Unavoidably O(N^2) anyways.
-
-* Two graphs in one session? - Potentially faster, don't really see how it'd work.
-
-"""
-
 
 if __name__ == '__main__':
-    # flags.define_flags()
-    # fl = flags()
     launch_managed_training()
-    # evaluate()
-    # evaluate()
