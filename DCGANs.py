@@ -1,3 +1,8 @@
+"""
+File containing different DCGAN architectures
+"""
+
+
 import tensorflow as tf
 import tflib as lib
 from functools import partial
@@ -6,15 +11,8 @@ FLAGS = tf.app.flags.FLAGS
 
 # from tensorflow.contrib import slim
 
-# Linting is important
 # MODE = FLAGS.gan_version
 # DIM = FLAGS.model_dim
-
-# Agile with scrum
-# Every two weeks a meeting, plan at first, do tickes, morning standups with updates
-# At the end of two weeks present to company
-# Teams of 3 - 6 people.
-
 # Implement DCGAN Architectres with adjustable complexities
 
 

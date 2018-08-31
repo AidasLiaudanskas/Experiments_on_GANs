@@ -1,4 +1,9 @@
 '''
+TL;DR:
+Specify desired hiperparameters in models_and_options tuple list. Run this file.
+Watch the training converge/diverge.
+
+
 Outline of the test:
 1. Implement 5-10 DCGAN-like Generator and Discriminator architectures with increasing complexity,
 while maintaining them symmetric.
@@ -70,7 +75,9 @@ models_and_options = [
 ]
 
 """Make tuples of:
-(model_name, G_dim, D_dim, G_ver, D_ver, datset_name, restore_initially)
+(model_name, G_dim, D_dim, G_ver, D_ver, datset_name, restore_initially).
+dataset_name here is just for save_file naming purposes, to change the dataset used
+for training, have to change it in flags.py
 """
 
 

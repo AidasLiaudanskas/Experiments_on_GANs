@@ -1,3 +1,7 @@
+"""
+All the functions that don't fit in anywhere else or reduce readability.
+"""
+
 import tensorflow as tf
 import tflib as lib
 import tflib.ops.linear

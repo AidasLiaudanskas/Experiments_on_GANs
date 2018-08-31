@@ -3,7 +3,6 @@
 This is the code I wrote for my Master's thesis. This is a public branch, meaning it's stripped of all the bigger files (datasets, models, summaries, outputs). Thesis abstract describing the experiments is in the pdf file.
 
 
-
 What it does:
 Code for training diffrent versions of GANs with few different architecture for Generator and Discriminator
 The code is built on a fork of [this repository](https://github.com/igul222/improved_wgan_training).
@@ -50,6 +49,7 @@ Some files are obsolete, as the main goal of the codebase changed with time.
 
 - Python, NumPy, TensorFlow, SciPy, Matplotlib
 - A recent NVIDIA GPU
+- Datasets in ./data folder. They must be in tfrecords format, resolutions specified in flags.py
 
 
 ## How to run the experiments:

@@ -1,3 +1,14 @@
+"""
+TL;DR:
+Calculates inception v3 activations on real dataset, stores them in ./tmp/dataset_stats.npz
+
+
+
+In order to calculate FID/KID we need to have inception_v3 activations calculated
+on the actual dataset. This script does that and saves the activations in a npz file.
+"""
+
+
 #!/usr/bin/env python3
 
 # import os

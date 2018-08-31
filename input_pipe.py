@@ -1,3 +1,8 @@
+"""
+Abstraction functions to take care of the tfrecords format.
+
+"""
+
 import tensorflow as tf
 FLAGS = tf.app.flags.FLAGS
 

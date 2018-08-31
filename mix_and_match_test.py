@@ -218,7 +218,7 @@ Unavoidably O(N^2) anyways.
 
 * Two graphs in one session? - Potentially faster, don't really see how it'd work.
 
-TODO: Get rid of this no variables to restore error!!!
+TODO: Get rid of this no variables to restore error!!! - Done
 """
 
 

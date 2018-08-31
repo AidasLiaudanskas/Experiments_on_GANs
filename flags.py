@@ -1,3 +1,8 @@
+"""
+Singleton class containing all the important parameters for training.
+
+""""
+
 import tensorflow as tf
 
 FLAGS = tf.app.flags.FLAGS

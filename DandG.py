@@ -1,3 +1,9 @@
+"""
+Starting point for architecture design. Used as a reference.
+
+"""
+
+
 import tensorflow as tf
 import tflib as lib
 import functools
